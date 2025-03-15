@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="x-icon" href="logo (2).png">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <title>Game Angkorwat</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: "Press Start 2P", serif;
+      font-weight: 400;
+      font-style: normal9;
+      background: #000;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      max-width: 1440px;
+      margin: 0 auto;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: url('AngkorWat.png') no-repeat center center;
+      background-size: cover;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .controls button {
+      padding: 10px 20px;
+      font-size: 20px;
+      background-color: #000000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      box-shadow:0 0.1em 20px #fff, 0.05em -0.03em 0 #fff,
+        0.05em 0.005em 0 #fff, 0em 0.08em 0 #fff, 0.05em 0.08em 0 #fff, 0 -0.03em 0 #fff, -0.03em -0.03em 0 #fff, -0.03em 
+      0.08em 0 #fff, -0.03em 0 0 #fff;
+    }
+
+    .controls button:hover {
+      background-color: #bf1313;
+      box-shadow:0 0.1em 20px #fff, 0.05em -0.03em 0 #fff,
+        0.05em 0.005em 0 #fff, 0em 0.08em 0 #fff, 0.05em 0.08em 0 #fff, 0 -0.03em 0 #fff, -0.03em -0.03em 0 #fff, -0.03em 
+      0.08em 0 #fff, -0.03em 0 0 #fff;
+    }
+
+    .fa {
+      font-size: 30px;
+      margin: 0 20px;
+    }
+
+    .game-over-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 30px;
+      display: none;
+    }
+
+    .game-over-container button {
+      padding: 10px 20px;
+      font-size: 20px;
+      background-color: #bf1313;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 0.1em 20px #000, 0.05em -0.03em 0 #000,
+        0.05em 0.005em 0 #000, 0em 0.08em 0 #000, 0.05em 0.08em 0 #000, 0 -0.03em 0 #000, -0.03em -0.03em 0 #000, -0.03em 
+      0.08em 0 #000, -0.03em 0 0 #000;
+      font-family: "Press Start 2P", serif;
+      font-weight: 400;
+      font-style: normal9;
+      color: #ffffff;
+    }
+
+    .game-over-container button:hover {
+      background-color: #e90a0a;
+    }
+    p{
+      font-size:45px ;
+      color:#ffbf00;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow: 0 0.1em 20px #000, 0.05em -0.03em 0 #000,
+        0.05em 0.005em 0 #000, 0em 0.08em 0 #000, 0.05em 0.08em 0 #000, 0 -0.03em 0 #000, -0.03em -0.03em 0 #000, -0.03em 
+      0.08em 0 #000, -0.03em 0 0 #000 ;
+    }
+     h6{
+      color:#000;
+      margin-top: 3px;
+      padding: -5px;
+      font-size: 10px;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow:0 0.1em 20px #fff, 0.05em -0.03em 0 #fff,
+        0.05em 0.005em 0 #fff, 0em 0.08em 0 #fff, 0.05em 0.08em 0 #fff, 0 -0.03em 0 #fff, -0.03em -0.03em 0 #fff, -0.03em 
+      0.08em 0 #fff, -0.03em 0 0 #fff;
+     }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <h6>Designed by BoraYeim</h6>
+  <div id="gameOverContainer" class="game-over-container">
+    <p class="animate__animated animate__zoomIn animate__infinite">GameOver</p>
+    <button id="restartButton" class="animate__animated animate__fadeIn animate__infinite">Restart</button>
+  </div>
+     
+  <div class="controls">
+    <button id="leftButton"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+    <button id="shootButton"><i class="fa-solid fa-crosshairs"></i></button>
+    <button id="rightButton"><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+   
+  </div>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const player = {
+      x: 175,
+      y: 500,
+      width: 50,
+      height: 50,
+      speed: 5,
+      image: new Image(),
+    };
+    player.image.src = 'player.png';
+
+    const bullet = {
+      x: 0,
+      y: player.y,
+      width: 5,
+      height: 15,
+      speed: 25,
+      active: false,
+      image: new Image(),
+    };
+    bullet.image.src = 'bullet.png';
+
+    const enemies = [];
+    const numEnemies = 8;
+
+    for (let i = 0; i < numEnemies; i++) {
+      enemies.push({
+        x: Math.random() * (canvas.width - 50),
+        y: Math.random() * 150,
+        width: 50,
+        height: 50,
+        speed: 2 + Math.random() * 2,
+        image: new Image(),
+      });
+      enemies[i].image.src = 'enemy.png';
+    }
+
+    let score = 0;
+    let gameOver = false;
+    const keys = {};
+
+    document.addEventListener('keydown', (e) => (keys[e.key] = true));
+    document.addEventListener('keyup', (e) => (keys[e.key] = false));
+
+     document.getElementById('leftButton').addEventListener('touchstart', () => keys['ArrowLeft'] = true);
+    document.getElementById('leftButton').addEventListener('touchend', () => keys['ArrowLeft'] = false);
+    document.getElementById('rightButton').addEventListener('touchstart', () => keys['ArrowRight'] = true);
+    document.getElementById('rightButton').addEventListener('touchend', () => keys['ArrowRight'] = false);
+    document.getElementById('shootButton').addEventListener('touchstart', () => keys[' '] = true);
+    document.getElementById('shootButton').addEventListener('touchend', () => keys['​ '] = false);
+
+    function restartGame() {
+      gameOver = false;
+      score = 0;
+      player.x = 175;
+      player.y = 500;
+      bullet.active = false;
+      enemies.forEach((enemy) => {
+        enemy.x = Math.random() * (canvas.width - enemy.width);
+        enemy.y = Math.random() * 100;
+      });
+      document.getElementById('gameOverContainer').style.display = 'none';
+      gameLoop();
+    }
+
+    function displayGameOver() {
+      document.getElementById('gameOverContainer').style.display = 'block';
+    }
+
+    function gameLoop() {
+      if (gameOver) {
+        displayGameOver();
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+      if (keys['ArrowRight'] && player.x < canvas.width - player.width) player.x += player.speed;
+
+      if (keys[' '] && !bullet.active) {
+        bullet.x = player.x + player.width / 2 - bullet.width / 2;
+        bullet.y = player.y;
+        bullet.active = true;
+      }
+
+      if (bullet.active) {
+        bullet.y -= bullet.speed;
+        if (bullet.y < 0) bullet.active = false;
+      }
+
+      ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
+
+      if (bullet.active) ctx.drawImage(bullet.image, bullet.x, bullet.y, bullet.width, bullet.height);
+
+      enemies.forEach((enemy) => {
+        enemy.y += enemy.speed;
+        if (enemy.y > canvas.height) {
+          enemy.y = -50;
+          enemy.x = Math.random() * (canvas.width - enemy.width);
+        }
+
+        if (
+          player.x < enemy.x + enemy.width &&
+          player.x + player.width > enemy.x &&
+          player.y < enemy.y + enemy.height &&
+          player.y + player.height > enemy.y
+        ) {
+          gameOver = true;
+        }
+
+        if (
+          bullet.active &&
+          bullet.x < enemy.x + enemy.width &&
+          bullet.x + bullet.width > enemy.x &&
+          bullet.y < enemy.y + enemy.height &&
+          bullet.y + bullet.height > enemy.y
+        ) {
+          bullet.active = false;
+          score++;
+          enemy.y = -50;
+          enemy.x = Math.random() * (canvas.width - enemy.width);
+        }
+
+        ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.width, enemy.height);
+      });
+
+      ctx.font = '20px Arial';
+      ctx.fillStyle = 'white';
+      ctx.fillText(`Score: ${score}`, 10, 30);
+      
+      requestAnimationFrame(gameLoop);
+    }
+
+    document.getElementById('restartButton').addEventListener('click', restartGame);
+
+    gameLoop();
+  </script>
+</body>
+</html>
